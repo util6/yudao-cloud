@@ -1,0 +1,213 @@
+--- #################### 注册中心 + 配置中心相关配置 ####################
+
+spring:
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848 # Nacos 服务器地址
+      username: # Nacos 账号
+      password: # Nacos 密码
+      discovery: # 【服务发现】配置项
+        enabled: false # 禁用服务发现，学习模块不需要注册到Nacos
+        namespace: dev # 命名空间。这里使用 dev 开发环境
+        group: DEFAULT_GROUP # 使用的 Nacos 配置分组，默认为 DEFAULT_GROUP
+        metadata:
+          version: 1.0.0 # 服务实例的版本号，可用于灰度发布
+      config: # 【配置中心】配置项
+        enabled: false # 禁用Nacos配置中心，使用本地配置文件
+        import-check:
+          enabled: false # 禁用Nacos配置检查
+        namespace: dev # 命名空间。这里使用 dev 开发环境
+        group: DEFAULT_GROUP # 使用的 Nacos 配置分组，默认为 DEFAULT_GROUP
+
+--- #################### 数据库相关配置 ####################
+spring:
+  # 数据源配置项
+  datasource:
+    druid: # Druid 【监控】相关的全局配置
+      web-stat-filter:
+        enabled: true
+      stat-view-servlet:
+        enabled: true
+        allow: # 设置白名单，不填则允许所有访问
+        url-pattern: /druid/*
+        login-username: # 控制台管理用户名和密码
+        login-password:
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true # 慢 SQL 记录
+          slow-sql-millis: 100
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+    dynamic: # 多数据源配置
+      druid: # Druid 【连接池】相关的全局配置
+        initial-size: 1 # 初始连接数
+        min-idle: 1 # 最小连接池数量
+        max-active: 20 # 最大连接池数量
+        max-wait: 60000 # 配置获取连接等待超时的时间，单位：毫秒（1 分钟）
+        time-between-eviction-runs-millis: 60000 # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位：毫秒（1 分钟）
+        min-evictable-idle-time-millis: 600000 # 配置一个连接在池中最小生存的时间，单位：毫秒（10 分钟）
+        max-evictable-idle-time-millis: 1800000 # 配置一个连接在池中最大生存的时间，单位：毫秒（30 分钟）
+        validation-query: SELECT 1 FROM DUAL # 配置检测连接是否有效
+        test-while-idle: true
+        test-on-borrow: false
+        test-on-return: false
+        pool-prepared-statements: true # 是否开启 PreparedStatement 缓存
+        max-pool-prepared-statement-per-connection-size: 20 # 每个连接缓存的 PreparedStatement 数量
+      primary: master
+      datasource:
+        master:
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true # MySQL Connector/J 8.X 连接的示例
+          username: root
+          password: 123456
+        slave: # 模拟从库，可根据自己需要修改
+          lazy: true # 开启懒加载，保证启动速度
+          url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&rewriteBatchedStatements=true
+          username: root
+          password: 123456
+
+  # Redis 配置。Redisson 默认的配置足够使用，一般不需要进行调优
+  data:
+    redis:
+      host: 127.0.0.1 # 地址
+      port: 6379 # 端口
+      database: 0 # 数据库索引
+#      password: 123456 # 密码，建议生产环境开启
+
+--- #################### MQ 消息队列相关配置 ####################
+
+# rocketmq 配置项，对应 RocketMQProperties 配置类
+rocketmq:
+  name-server: 127.0.0.1:9876 # RocketMQ Namesrv
+
+spring:
+  # RabbitMQ 配置项，对应 RabbitProperties 配置类
+  rabbitmq:
+    host: 127.0.0.1 # RabbitMQ 服务的地址
+    port: 5672 # RabbitMQ 服务的端口
+    username: guest # RabbitMQ 服务的账号
+    password: guest # RabbitMQ 服务的密码
+  # Kafka 配置项，对应 KafkaProperties 配置类
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092 # 指定 Kafka Broker 地址，可以设置多个，以逗号分隔
+
+--- #################### 定时任务相关配置 ####################
+
+xxl:
+  job:
+    enabled: false # 是否开启调度中心，默认为 true 开启
+    admin:
+      addresses: http://127.0.0.1:9090/xxl-job-admin # 调度中心部署跟地址
+
+--- #################### 服务保障相关配置 ####################
+
+# Lock4j 配置项
+lock4j:
+  acquire-timeout: 3000 # 获取分布式锁超时时间，默认为 3000 毫秒
+  expire: 30000 # 分布式锁的超时时间，默认为 30 毫秒
+
+--- #################### 监控相关配置 ####################
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      base-path: /actuator # Actuator 提供的 API 接口的根目录。默认为 /actuator
+      exposure:
+        include: '*' # 需要开放的端点。默认值只打开 health 和 info 两个端点。通过设置 * ，可以开放所有端点。
+
+# Spring Boot Admin 配置项
+spring:
+  boot:
+    admin:
+      # Spring Boot Admin Client 客户端的相关配置
+      client:
+        instance:
+          service-host-type: IP # 注册实例时，优先使用 IP [IP, HOST_NAME, CANONICAL_HOST_NAME]
+
+# 日志文件配置
+logging:
+  file:
+    name: ${user.home}/logs/${spring.application.name}.log # 日志文件名，全路径
+  level:
+    # 配置自己写的 MyBatis Mapper 打印日志
+    cn.iocoder.yudao.learning: debug
+    cn.iocoder.yudao.module.system.dal.mysql: debug
+    org.springframework.context.support.PostProcessorRegistrationDelegate: ERROR # TODO 芋艿：先禁用，Spring Boot 3.X 存在部分错误的 WARN 提示
+
+--- #################### 芋道相关配置 ####################
+
+# 芋道配置项，设置当前项目所有自定义的配置
+yudao:
+  info:
+    version: 1.0.0
+    base-package: cn.iocoder.yudao # 必需的基础包配置
+  web:
+    admin-ui:
+      url: http://localhost:8080 # Admin UI 的地址配置
+  env: # 多环境的配置项
+    tag: ${HOSTNAME}
+  captcha:
+    enable: false # 本地环境，暂时关闭图片验证码，方便登录等接口的测试
+  security:
+    mock-enable: true
+  access-log: # 访问日志的配置项
+    enable: true
+    
+# 微服务相关配置 - 学习模块不启用微服务
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+
+--- #################### 第三方服务Mock配置 ####################
+
+# 微信相关Mock配置
+wx:
+  mp:
+    app-id: mock_app_id
+    secret: mock_secret
+    token: mock_token
+    aes-key: mock_aes_key
+  miniapp:
+    app-id: mock_miniapp_id
+    secret: mock_miniapp_secret
+  open:
+    app-id: mock_open_app_id
+    app-secret: mock_open_secret
+
+# 邮件服务Mock配置
+spring:
+  mail:
+    host: smtp.163.com
+    port: 465
+    username: mock@163.com
+    password: mock_password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+            required: true
+          socketFactory:
+            class: javax.net.ssl.SSLSocketFactory
+            port: 465
+
+# 短信服务Mock配置
+yudao:
+  sms:
+    alibaba:
+      access-key-id: mock_access_key
+      access-key-secret: mock_secret
+  # 短信验证码配置
+  sms-code:
+    begin-code: 100000 # 验证码最小值
+    end-code: 999999 # 验证码最大值
+    expire-times: 10 # 过期时间（分钟）
+    send-frequency: 60 # 发送频率（秒）
+    send-maximum-quantity-per-day: 10 # 每日发送最大数量

@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  pd:
+    image: pingcap/pd:v5.4.0
+    container_name: local-pd
+    ports:
+      - "2379:2379"
+    volumes:
+      - pd-data:/data
+    command:
+      - --name=pd
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd:2379
+      - --advertise-peer-urls=http://pd:2380
+      - --initial-cluster=pd=http://pd:2380
+      - --data-dir=/data/pd
+    networks:
+      - dev-network
+
+  tikv:
+    image: pingcap/tikv:v5.4.0
+    container_name: local-tikv
+    depends_on:
+      - pd
+    ports:
+      - "20160:20160"
+    volumes:
+      - tikv-data:/data
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv:20160
+      - --data-dir=/data/tikv
+      - --pd=pd:2379
+    networks:
+      - dev-network
+
+  tidb:
+    image: pingcap/tidb:v5.4.0
+    container_name: local-tidb
+    depends_on:
+      - tikv
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    command:
+      - --store=tikv
+      - --path=pd:2379
+      - --advertise-address=tidb
+    networks:
+      - dev-network
+
+volumes:
+  pd-data:
+  tikv-data:
+
+networks:
+  dev-network:

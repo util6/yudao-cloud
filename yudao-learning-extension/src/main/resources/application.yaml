@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: learning-server
+    
+  profiles:
+    active: local
+
+  # 允许循环依赖，学习模块可能需要这个
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+    
+  # 数据源配置
+  autoconfigure:
+    exclude:
+      - org.springframework.cloud.gateway.config.GatewayAutoConfiguration
+      - org.springframework.cloud.gateway.config.GatewayClassPathWarningAutoConfiguration
+      - org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration # 禁用邮件自动配置
+      - org.springframework.boot.autoconfigure.freemarker.FreeMarkerAutoConfiguration # 禁用FreeMarker自动配置
+      
+  config:
+    import:
+      - optional:classpath:application-${spring.profiles.active}.yaml # 加载【本地】配置
+  
+  cloud:
+    nacos:
+      config:
+        import-check:
+          enabled: false # 禁用Nacos配置检查
+
+# 服务器配置
+server:
+  port: 48081
+
+# 日志配置
+logging:
+  level:
+    cn.iocoder.yudao.learning: DEBUG
+    cn.iocoder.yudao.module.system: INFO
+    cn.iocoder.yudao.framework: INFO
+    
+# 禁用某些不需要的功能
+yudao:
+  demo: false  # 关闭演示模式
+  captcha:
+    enable: false  # 关闭验证码，方便学习测试

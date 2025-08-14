@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  nacos:
+    image: nacos/nacos-server:2.0.3
+    container_name: local-nacos
+    environment:
+      - MODE=standalone
+      - JVM_XMS=256m
+      - JVM_XMX=256m
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+    volumes:
+      - nacos-data:/home/nacos/data
+    networks:
+      - dev-network
+
+volumes:
+  nacos-data:
+
+networks:
+  dev-network:

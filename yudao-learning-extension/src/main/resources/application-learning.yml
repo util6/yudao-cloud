@@ -1,0 +1,175 @@
+# YuDao Cloud 独立学习模块配置
+# 这个配置文件专门为学习模块设计，包含了学习所需的最小化配置
+
+server:
+  port: 18080  # 使用不同的端口避免与主项目冲突
+
+spring:
+  application:
+    name: yudao-learning-module
+  
+  # 数据源配置 - 连接到YuDao Cloud的数据库
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/ruoyi-vue-pro?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  # Redis配置
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+      database: 1
+      timeout: 6000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-wait: -1ms
+          max-idle: 8
+          min-idle: 0
+
+  # Jackson配置
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+      write-date-timestamps-as-nanoseconds: false
+      fail-on-empty-beans: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+  global-config:
+    db-config:
+      id-type: NONE
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+    banner: false
+  type-aliases-package: cn.iocoder.yudao.module.*.dal.dataobject
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    cn.iocoder.yudao.learning: DEBUG
+    cn.iocoder.yudao.framework: INFO
+    cn.iocoder.yudao.module: INFO
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+
+# YuDao框架配置
+yudao:
+  # 学习模块专用配置
+  learning:
+    enabled: true
+    # 多租户学习配置
+    tenant:
+      enabled: true
+      demo-mode: true
+      default-tenant-id: 1
+      auto-switch-demo: true
+    # 认证学习配置
+    auth:
+      enabled: true
+      demo-mode: true
+      mock-user-id: 1
+    # 支付学习配置
+    payment:
+      enabled: true
+      demo-mode: true
+      mock-payment: true
+    # 工作流学习配置
+    workflow:
+      enabled: true
+      demo-mode: true
+    # 缓存学习配置
+    cache:
+      enabled: true
+      demo-mode: true
+      
+  # 安全配置（学习模式下简化）
+  security:
+    permit-all_urls:
+      - /learning/**
+      - /actuator/**
+      - /h2-console/**
+    
+  # 租户配置
+  tenant:
+    enable: true
+    ignore-urls:
+      - /learning/**
+      - /actuator/**
+    ignore-tables:
+      - system_tenant
+      - system_tenant_package
+      - system_dict_data
+      - system_dict_type
+      - system_error_code
+      - system_menu
+      - system_sms_template
+      - system_sms_log
+      - system_sms_code
+      - system_oauth2_code
+      - system_oauth2_access_token
+      - system_oauth2_refresh_token
+      - system_oauth2_approve
+      - system_oauth2_client
+      - infra_codegen_column
+      - infra_codegen_table
+      - infra_test_demo
+      - infra_config
+      - infra_file_config
+      - infra_file
+      - infra_job
+      - infra_job_log
+      - infra_data_source_config
+
+  # 数据权限配置
+  datapermission:
+    enable: true
+
+# 学习模块专用配置
+learning:
+  # 学习模式配置
+  mode:
+    interactive: true      # 交互式学习
+    auto-demo: true       # 自动演示
+    detailed-log: true    # 详细日志
+    
+  # 学习统计配置
+  statistics:
+    enabled: true
+    auto-report: true
+    report-interval: 300  # 5分钟生成一次报告
+    
+  # 学习数据配置
+  data:
+    auto-init: true       # 自动初始化学习数据
+    mock-data: true       # 使用模拟数据
+    cleanup-on-exit: false # 退出时不清理数据
+    
+  # 学习提示配置
+  tips:
+    enabled: true
+    level: DETAILED       # BASIC, DETAILED, EXPERT
+    show-sql: true        # 显示SQL语句
+    show-performance: true # 显示性能信息
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always

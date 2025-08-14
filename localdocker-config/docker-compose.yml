@@ -1,0 +1,105 @@
+version: '3'
+
+# 这是主compose文件，用于控制启动哪些服务
+# 使用方法：
+# 1. 启动所有服务: docker-compose up -d
+# 2. 启动指定服务: docker-compose up -d mysql redis
+# 3. 停止所有服务: docker-compose down
+# 4. 停止指定服务: docker-compose stop mysql redis
+# 5. 查看服务状态: docker-compose ps
+
+networks:
+  dev-network:
+    name: local-dev-network
+
+services:
+  # 以下是可选服务，取消注释即可启用
+
+  # MySQL数据库
+  mysql:
+    extends:
+      file: ./compose-files/docker-compose-mysql.yml
+      service: mysql
+  
+  # Redis缓存
+  redis:
+    extends:
+      file: ./compose-files/docker-compose-redis.yml
+      service: redis
+  
+  # MongoDB文档数据库
+  mongodb:
+    extends:
+      file: ./compose-files/docker-compose-mongodb.yml
+      service: mongodb
+  
+  # Nginx Web服务器
+  nginx:
+    extends:
+      file: ./compose-files/docker-compose-nginx.yml
+      service: nginx
+  
+  # RabbitMQ消息队列
+  rabbitmq:
+    extends:
+      file: ./compose-files/docker-compose-rabbitmq.yml
+      service: rabbitmq
+  
+  # Elasticsearch搜索引擎
+  elasticsearch:
+    extends:
+      file: ./compose-files/docker-compose-elk.yml
+      service: elasticsearch
+  
+  # Kibana可视化工具
+  kibana:
+    extends:
+      file: ./compose-files/docker-compose-elk.yml
+      service: kibana
+    depends_on:
+      - elasticsearch
+  
+  # Nacos服务注册与配置中心
+  nacos:
+    extends:
+      file: ./compose-files/docker-compose-nacos.yml
+      service: nacos
+  
+  # Portainer Docker管理界面
+  portainer:
+    extends:
+      file: ./compose-files/docker-compose-portainer.yml
+      service: portainer
+  
+  # TiDB数据库集群
+  pd:
+    extends:
+      file: ./compose-files/docker-compose-tidb.yml
+      service: pd
+  
+  tikv:
+    extends:
+      file: ./compose-files/docker-compose-tidb.yml
+      service: tikv
+    depends_on:
+      - pd
+  
+  tidb:
+    extends:
+      file: ./compose-files/docker-compose-tidb.yml
+      service: tidb
+    depends_on:
+      - tikv
+
+# 定义持久化卷
+volumes:
+  mysql-data:
+  redis-data:
+  mongodb-data:
+  elasticsearch-data:
+  nginx-logs:
+  rabbitmq-data:
+  nacos-data:
+  portainer-data:
+  pd-data:
+  tikv-data:

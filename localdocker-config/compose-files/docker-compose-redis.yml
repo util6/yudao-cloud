@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  redis:
+    image: redis
+
+    # 此配置项是解决arm64 架构下，mysql 拉取镜像失败的问题
+    platform: linux/arm64
+    container_name: local-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ../config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - dev-network
+
+volumes:
+  redis-data:
+
+networks:
+  dev-network:
